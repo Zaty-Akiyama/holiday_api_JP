@@ -8,6 +8,8 @@ class fetch_holiday
 
     $fetch_archive = self::_fetch_archives( intval($year) );
 
+    if( $fetch_archive === null ) return false;
+
     foreach ($fetch_archive as $key => $value) {
       if( !preg_match( "/^$year\-$month/", $key ) ) continue;
 
@@ -23,7 +25,7 @@ class fetch_holiday
   private static function _fetch_archives ( int $year )
   {
     $holiday_json = null;
-    $file_path = "./archives/$year";
+    $file_path = API_PATH . "/archives/$year";
     if( file_exists( $file_path ) )
     {
       $holiday_json = file_get_contents( $file_path . '/date.json' );
@@ -48,13 +50,13 @@ class fetch_holiday
 
     if( $formed_results === false ) return;
 
-    if( !file_exists( './archives' ) )
+    if( !file_exists( API_PATH . '/archives' ) )
     {
-      mkdir( "./archives", 0700 );
+      mkdir( API_PATH . "/archives", 0700 );
     }
 
-    mkdir( "./archives/$year", 0700 );
-    file_put_contents( "./archives/$year/date.json", $formed_results );
+    mkdir( API_PATH . "/archives/$year", 0700 );
+    file_put_contents( API_PATH . "/archives/$year/date.json", $formed_results );
 
     return $formed_results;
   }
@@ -64,7 +66,7 @@ class fetch_holiday
     $end_month   = mktime( 0, 0, 0, 1, 0, $year + 1);
   
     // Google API の アプリケーションキーは外部ファイルで保存
-    include_once('./private.php');
+    include_once API_PATH . '/private.php';
     $app_key = get_application_key(); // private.phpで定義した関数
 
     $url = sprintf(
@@ -91,8 +93,7 @@ class fetch_holiday
   private static function _forming_api_result ( array $result )
   {
     if( !is_array($result) ) return false;
-    if( !isset($result['summary']) || $result['summary'] !== '日本の祝日' ) return false;
-  
+    if( !isset($result['summary']) || empty($result['items']) ) return false;
     $public_holiday_yearly = array();
   
     foreach( $result['items'] as $items )
