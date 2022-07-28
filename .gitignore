@@ -1,2 +1,4 @@
 fetch/private.php
 archives
+.DS_Store
+.vscode
