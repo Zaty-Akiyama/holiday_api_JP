@@ -11,7 +11,11 @@ if( !isset($year) || $year === '' || !isset($month) || $month === '' )
 {
   $error_msg = 'yearパラメータとmonthパラメータがセットされていません';
 
-} else
+}elseif( strlen($year) !== 4 || strlen($month) !== 2 ){
+  $error_msg = 'yearパラメータとmonthパラメータの書式が不適切です';
+}elseif( intval($year) < 2015 ){
+  $error_msg = '2014年以前の祝日データはありません';
+}else
 {
   define( 'API_PATH' , __DIR__ . '/fetch' );
   include_once API_PATH . '/fetch_holiday.php';
